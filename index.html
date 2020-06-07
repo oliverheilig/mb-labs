@@ -1,0 +1,69 @@
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='./mapbox-gl-unminified.js'></script>
+    <!-- <link href='https://unpkg.com/mapbox-gl@1.10.0/dist/mapbox-gl.css' rel='stylesheet' /> -->
+    <link href='./mapbox-gl.css' rel='stylesheet' />
+    <script src='./token.js'></script>
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+        .marker {
+            background-size: cover;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+.mapboxgl-popup {
+  max-width: 200px;
+}
+
+.mapboxgl-popup-content {
+  text-align: center;
+  font-family: 'Open Sans', sans-serif;
+}    </style>
+</head>
+<body>
+
+<div id='map'></div>
+<script>
+
+var mapLocation = [2.351667, 48.856667];
+
+var map = new mapboxgl.Map({
+    container: 'map', // container id
+    style: {
+        "version": 8,
+        "sources": {
+            "simple-tiles": {
+                "type": "raster",
+                "tiles": [
+                    'https://xserver2-test.cloud.ptvgroup.com/services/rest/XMap/experimental/tile/{z}/{x}/{y}?layers=background,transport,labels,PTV_TruckAttributes&contentType=JSON&drawIcons=false&featureRenderingInformation=true&xtok=' + window.token + '&referenceTime=' + new Date().toISOString()
+                ],
+                "tileSize": 256,
+                "attribution": "PTV, HERE"
+            }
+        },
+        "layers": [{
+            "id": "simple-tiles",
+            "type": "raster",
+            "source": "simple-tiles",
+            "minzoom": 0,
+            "maxzoom": 23
+        }]
+    },
+    center: mapLocation, // starting position
+    zoom: 16, // starting zoom
+    maxTileCacheSize: 0 // required for FeatureLayers
+});
+
+</script>
+
+</body>
+</html>
