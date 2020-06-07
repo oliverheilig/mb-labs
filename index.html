@@ -3,31 +3,26 @@
     <meta charset='utf-8' />
     <title></title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <!-- <link href='https://unpkg.com/mapbox-gl@1.10.1/dist/mapbox-gl.css' rel='stylesheet' /> -->
     <script src='./mapbox-gl-unminified.js'></script>
-    <!-- <link href='https://unpkg.com/mapbox-gl@1.10.0/dist/mapbox-gl.css' rel='stylesheet' /> -->
     <link href='./mapbox-gl.css' rel='stylesheet' />
     <script src='./token.js'></script>
     <style>
         body { margin:0; padding:0; }
         #map { position:absolute; top:0; bottom:0; width:100%; }
         .marker {
-            background-size: cover;
+            display: block;
             border: none;
+            border-radius: 50%;
             cursor: pointer;
             padding: 0;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
         }
 
-.mapboxgl-popup {
-  max-width: 200px;
-}
-
-.mapboxgl-popup-content {
-  text-align: center;
-  font-family: 'Open Sans', sans-serif;
-}    </style>
+        .mapboxgl-popup-content {
+            font-family: 'Open Sans', sans-serif;
+        }    
+        
+    </style>
 </head>
 <body>
 

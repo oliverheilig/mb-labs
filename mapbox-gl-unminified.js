@@ -1338,6 +1338,15 @@ function arrayBufferToImage(data, callback, cacheControl, expires) {
     img.expires = expires;
     img.src = data.byteLength ? URL.createObjectURL(blob) : transparentPngUrl;
 }
+function jsonToImageBitmap(data, callback) {
+    var y = Uint8Array.from(self.atob(data.image), function(c) { return c.charCodeAt(0);});
+    var blob = new self.Blob([y], { type: 'image/png' });
+    self.createImageBitmap(blob).then(function (imgBitmap) {
+        callback(null, [imgBitmap, data]);
+    }).catch(function (e) {
+        callback(new Error('Could not load image because of ' + e.message + '. Please make sure to use a supported image type such as PNG or JPEG. Note that SVGs are not supported.'));
+    });
+}
 function arrayBufferToImageBitmap(data, callback) {
     var blob = new self.Blob([new Uint8Array(data)], { type: 'image/png' });
     self.createImageBitmap(blob).then(function (imgBitmap) {
@@ -1389,18 +1398,25 @@ var getImage = function (requestParameters, callback) {
             }
         }
     };
-    var request = getArrayBuffer(requestParameters, function (err, data, cacheControl, expires) {
+    var request = getJSON(requestParameters, function (err, data, cacheControl, expires) {
         advanceImageRequestQueue();
         if (err) {
             callback(err);
         } else if (data) {
-            if (offscreenCanvasSupported()) {
-                arrayBufferToImageBitmap(data, callback);
-            } else {
-                arrayBufferToImage(data, callback, cacheControl, expires);
-            }
+            jsonToImageBitmap(data, callback);
         }
-    });
+    // var request = getArrayBuffer(requestParameters, function (err, data, cacheControl, expires) {
+    //     advanceImageRequestQueue();
+    //     if (err) {
+    //         callback(err);
+    //     } else if (data) {
+    //         if (offscreenCanvasSupported()) {
+    //             arrayBufferToImageBitmap(data, callback);
+    //         } else {
+    //             arrayBufferToImage(data, callback, cacheControl, expires);
+    //         }
+    //     }
+     });
     return {
         cancel: function () {
             request.cancel();
@@ -2977,7 +2993,7 @@ var filter_operator = {
 		has: {
 		},
 		"!has": {
-		},
+        },
 		within: {
 		}
 	}
@@ -3031,8 +3047,8 @@ var expression_name = {
 		},
 		"index-of": {
 			group: "Lookup"
-		},
-		slice: {
+        },
+        slice: {
 			group: "Lookup"
 		},
 		"case": {
@@ -3211,8 +3227,8 @@ var expression_name = {
 		},
 		floor: {
 			group: "Math"
-		},
-		distance: {
+        },
+        distance: {
 			group: "Math"
 		},
 		"==": {
@@ -10478,7 +10494,7 @@ function validateNonExpressionFilter(options) {
         } else if (type !== 'object') {
             errors.push(new ValidationError(key + '[1]', value[1], 'object expected, ' + type + ' found'));
         }
-        break;
+        break; 
     }
     return errors;
 }
@@ -27486,7 +27502,7 @@ var RasterTileSource = function (Evented) {
     RasterTileSource.prototype.loadTile = function loadTile(tile, callback) {
         var this$1 = this;
         var url = this.map._requestManager.normalizeTileURL(tile.tileID.canonical.url(this.tiles, this.scheme), this.tileSize);
-        tile.request = performance.getImage(this.map._requestManager.transformRequest(url, performance.ResourceType.Tile), function (err, img) {
+        tile.request = performance.getImage(this.map._requestManager.transformRequest(url, performance.ResourceType.Tile), function (err, imga) {
             delete tile.request;
             if (tile.aborted) {
                 tile.state = 'unloaded';
@@ -27494,7 +27510,63 @@ var RasterTileSource = function (Evented) {
             } else if (err) {
                 tile.state = 'errored';
                 callback(err);
-            } else if (img) {
+            } else if (imga) {
+                var img = imga[0];
+                if(imga[1].features) {
+                    tile.markers = [];
+                    var elemts = {};
+                    imga[1].features.forEach(function (f) {
+                        // var earthHalfCircum = Math.PI;
+                        // var earthCircum = earthHalfCircum * 2.0
+                        // var arc = earthCircum / Math.pow(2, tile.tileID.canonical.z);
+                        // var x = -earthHalfCircum + (tile.tileID.canonical.x + (f.referencePixelPoint.x / 256.0)) * arc;
+                        // var y = earthHalfCircum - (tile.tileID.canonical.y + (f.referencePixelPoint.y / 256.0)) * arc;
+                        // var lat = (360 / Math.PI) * (Math.atan(Math.exp(y)) - (Math.PI / 4));
+                        // var lng = (180.0 / Math.PI) * x;
+                        // console.warn(f.referencePixelPoint.x + '/' + f.referencePixelPoint.y);
+
+                        var lat = f.referenceCoordinate.y;
+                        var lng = f.referenceCoordinate.x;
+                        var key = lat + '/' + lng;
+                        var el = elemts[key];
+                        if(!el) {
+                            el = document.createElement('div');
+                            el.flAttrib = {};
+                            elemts[key] = el;
+                        }
+
+                        var m = document.createElement('div');
+                        m.className = 'marker';                        
+                        m.style.backgroundImage = 'url(https://xserver2-europe-eu-test.cloud.ptvgroup.com/services/rest/XRuntime/experimental/icon?iconReference=' + f.renderingInformation.iconReference + ')';     
+                        m.style.width = f.pixelBoundingBox.right - f.pixelBoundingBox.left + 'px';
+                        m.style.height = f.pixelBoundingBox.top - f.pixelBoundingBox.bottom + 'px';
+
+                        f.attributes.forEach(function (a) {
+                            el.flAttrib[a.key] = a.value;
+                        })
+                        
+                        el.appendChild(m);
+                    });
+
+                    Object.keys(elemts).forEach(function (e) {
+                        var html = '<table style="font-size: 13px;">';
+                        var el = elemts[e];
+                        Object.keys(el.flAttrib).forEach(function (a) {
+                            html = html.concat('<tr>');
+                            html = html.concat('<td><b>' + a + '</b></td><td>' + el.flAttrib[a] + '</td>');
+                            html = html.concat('</tr>');
+                        });
+                        html = html.concat('</table>');
+                        var c = e.split('/');
+                        var marker = new mapboxgl.Marker(el)
+                            .setLngLat([c[1], c[0]])
+                            .setPopup(new mapboxgl.Popup({ offset: 0 }) // add popups
+                                .setHTML(html))
+                            .addTo(this$1.map);             
+                            
+                        tile.markers.push(marker);  
+                    });
+                }
                 if (this$1.map._refreshExpiredTiles) {
                     tile.setExpiryData(img);
                 }
@@ -27526,8 +27598,15 @@ var RasterTileSource = function (Evented) {
         callback();
     };
     RasterTileSource.prototype.unloadTile = function unloadTile(tile, callback) {
+        var this$1 = this;
         if (tile.texture) {
             this.map.painter.saveTileTexture(tile.texture);
+        }
+        if (tile.markers) {
+            tile.markers.forEach(function (m) { 
+                m.remove();
+            });
+            tile.markers = null;
         }
         callback();
     };
