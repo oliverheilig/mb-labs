@@ -53,16 +53,16 @@ map.once('style.load', (ev) => {
                     'https://xserver2-test.cloud.ptvgroup.com/services/rest/XMap/experimental/tile/{z}/{x}/{y}?layers=PTV_TrafficIncidents&contentType=JSON&drawIcons=false&featureRenderingInformation=true&xtok=' + window.token + '&iconReference=true&referenceTime=' + new Date().toISOString()
                 ],
                 "tileSize": 256,
+                "minzoom": 0,
+                "maxzoom": 23,
                 "attribution": "PTV, HERE"
             });
-            map.addLayer({            
+  map.addLayer({            
             "id": "simple-tiles",
             "type": "raster",
             "source": "simple-tiles",
-            "minzoom": 0,
-            "maxzoom": 23
-        });
-    });
+        }, 'TSP_RoadOneWay_Label');
+      });
 
 
 </script>
