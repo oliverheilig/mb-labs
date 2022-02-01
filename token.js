@@ -1,1 +1,2 @@
-var token = '<your xserver-internet token>';
+var token = '';
+var apiKey = '';

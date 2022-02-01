@@ -27537,7 +27537,7 @@ var RasterTileSource = function (Evented) {
 
                         var m = document.createElement('div');
                         m.className = 'marker';                        
-                        m.style.backgroundImage = 'url(https://xserver2-europe-eu-test.cloud.ptvgroup.com/services/rest/XRuntime/experimental/icon?iconReference=' + f.renderingInformation.iconReference + ')';     
+                        m.style.backgroundImage = 'url(https://xserver2-europe-eu-test.cloud.ptvgroup.com/services/rest/XRuntime/icon/' + f.iconReference + ')';     
                         m.style.width = f.pixelBoundingBox.right - f.pixelBoundingBox.left + 'px';
                         m.style.height = f.pixelBoundingBox.top - f.pixelBoundingBox.bottom + 'px';
 

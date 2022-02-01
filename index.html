@@ -32,30 +32,38 @@ var mapLocation = [2.351667, 48.856667];
 
 var map = new mapboxgl.Map({
     container: 'map', // container id
-    style: {
-        "version": 8,
-        "sources": {
-            "simple-tiles": {
+    style: 'https://vectormaps-resources.myptv.com/styles/latest/standard.json',
+  transformRequest: (url, resourceType) => {
+    if (resourceType === 'Tile' && url.startsWith('https://api.myptv.com')) {
+      return {
+        url: url + '?apiKey=' + apiKey
+      }
+    }
+  },    
+    center: mapLocation, // starting position
+    zoom: 13, // starting zoom
+    maxTileCacheSize: 0 // required for FeatureLayers
+});
+
+
+map.once('style.load', (ev) => {
+  map.addSource('simple-tiles', {
                 "type": "raster",
                 "tiles": [
-                    'https://xserver2-test.cloud.ptvgroup.com/services/rest/XMap/experimental/tile/{z}/{x}/{y}?layers=background,transport,labels,PTV_TruckAttributes&contentType=JSON&drawIcons=false&featureRenderingInformation=true&xtok=' + window.token + '&referenceTime=' + new Date().toISOString()
+                    'https://xserver2-test.cloud.ptvgroup.com/services/rest/XMap/experimental/tile/{z}/{x}/{y}?layers=PTV_TrafficIncidents&contentType=JSON&drawIcons=false&featureRenderingInformation=true&xtok=' + window.token + '&iconReference=true&referenceTime=' + new Date().toISOString()
                 ],
                 "tileSize": 256,
                 "attribution": "PTV, HERE"
-            }
-        },
-        "layers": [{
+            });
+            map.addLayer({            
             "id": "simple-tiles",
             "type": "raster",
             "source": "simple-tiles",
             "minzoom": 0,
             "maxzoom": 23
-        }]
-    },
-    center: mapLocation, // starting position
-    zoom: 13, // starting zoom
-    maxTileCacheSize: 0 // required for FeatureLayers
-});
+        });
+    });
+
 
 </script>
 
