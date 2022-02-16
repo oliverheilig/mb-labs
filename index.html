@@ -50,12 +50,13 @@ map.once('style.load', (ev) => {
   map.addSource('simple-tiles', {
                 "type": "raster",
                 "tiles": [
-                    'https://xserver2-test.cloud.ptvgroup.com/services/rest/XMap/experimental/tile/{z}/{x}/{y}?layers=PTV_TrafficIncidents&contentType=JSON&drawIcons=false&featureRenderingInformation=true&xtok=' + window.token + '&iconReference=true&referenceTime=' + new Date().toISOString()
+                    'https://xserver2-test.cloud.ptvgroup.com/services/rest/XMap/experimental/tile/{z}/{x}/{y}?layers=PTV_TrafficIncidents&contentType=JSON' +
+                    '&userLanguage=en&timeConsideration=SNAPSHOT&drawIcons=false&featureRenderingInformation=true&xtok=' 
+                    + window.token + '&iconReference=true&referenceTime=' + new Date().toISOString()
                 ],
                 "tileSize": 256,
                 "minzoom": 0,
-                "maxzoom": 23,
-                "attribution": "PTV, HERE"
+                "maxzoom": 23
             });
   map.addLayer({            
             "id": "simple-tiles",
