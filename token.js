@@ -1,3 +1,3 @@
 // This are my personal api keys. Please get your own free key at https://developer.myptv.com/
-var token = '777870FF-8CD2-4CD2-8A1D-50F596B6507D'; 
+var token = 'B2BB2A6D-1AC1-4CD5-8C6A-5D2DD786C09A'; 
 var apiKey = 'YjA2OGIzOGMxMjdiNGZkOGIwYTMwNmI0OGE4Y2ZiMTc6Y2QwZjUyMDYtMTk2Ni00N2NlLWFmNTYtNzBjOWZjZTgxNzJh';
